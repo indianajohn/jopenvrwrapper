@@ -1,11 +1,9 @@
-package vrprovider;
+package openvrprovider;
 
 import jopenvr.JOpenVRLibrary;
 import jopenvr.VRControllerState_t;
 
-/**
- * Created by John on 7/29/2016.
- */
+/* Interface intended to be front-facing to user for controller interaction. */
 public interface ControllerListener {
     public final int LEFT_CONTROLLER = 0;
     public final int RIGHT_CONTROLLER = 1;

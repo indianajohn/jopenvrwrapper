@@ -1,24 +1,26 @@
-package vrprovider;
+package openvrprovider;
 
 import com.sun.jna.Memory;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
 import jopenvr.*;
 import jopenvr.JOpenVRLibrary.EVREventType;
-import org.joml.Matrix4f;
-
 import java.nio.IntBuffer;
 
-import static vrprovider.ControllerListener.LEFT_CONTROLLER;
-import static vrprovider.ControllerListener.RIGHT_CONTROLLER;
+import static openvrprovider.ControllerListener.LEFT_CONTROLLER;
+import static openvrprovider.ControllerListener.RIGHT_CONTROLLER;
 
-public class VRProvider implements Runnable {
+/* This class is designed to make all API calls to OpenVR, thereby insulating it from the user. If you're looking to get
+ * some information from the headset/controllers you should probably look at OpenVRStereoRenderer, ControllerListener,
+ * or OpenVRState
+  * */
+public class OpenVRProvider implements Runnable {
     private static boolean initialized = false;
     private static VR_IVRSystem_FnTable vrsystem;
     private static VR_IVRCompositor_FnTable vrCompositor;
     private static VR_IVROverlay_FnTable vrOverlay;
     private static VR_IVRSettings_FnTable vrSettings;
-    public VRState vrState = new VRState();
+    public OpenVRState vrState = new OpenVRState();
     private static int[] controllerDeviceIndex = new int[2];
     private static VRControllerState_t.ByReference[] inputStateRefernceArray = new VRControllerState_t.ByReference[2];
     private static VRControllerState_t[] controllerStateReference = new VRControllerState_t[2];
@@ -29,8 +31,7 @@ public class VRProvider implements Runnable {
     private float nearClip = 0.5f;
     private float farClip = 500.0f;
     private final static VRTextureBounds_t texBounds = new VRTextureBounds_t();
-    private final static Texture_t texType0 = new Texture_t();
-    private final static Texture_t texType1 = new Texture_t();
+    public static Texture_t texType[] = new Texture_t[2];
     private static boolean[] controllerTracking = new boolean[2];
     //keyboard
     private static boolean keyboardShowing = false;
@@ -91,7 +92,7 @@ public class VRProvider implements Runnable {
         return true;
     }
 
-    public VRProvider() {
+    public OpenVRProvider() {
         for (int c = 0; c < 2; c++) {
             controllerDeviceIndex[c] = -1;
             controllerStateReference[c] = new VRControllerState_t();
@@ -99,6 +100,7 @@ public class VRProvider implements Runnable {
             inputStateRefernceArray[c].setAutoRead(false);
             inputStateRefernceArray[c].setAutoWrite(false);
             inputStateRefernceArray[c].setAutoSynch(false);
+            texType[c] = new Texture_t();
         }
     }
 
@@ -156,23 +158,6 @@ public class VRProvider implements Runnable {
             throw new Exception(jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0));
         }
     }
-    private Matrix4f getProjectionMatrix(
-            int nEye,
-            float nearClip,
-            float farClip) {
-        Matrix4f matrixOutput = new Matrix4f();
-        getProjectionMatrix(matrixOutput,nEye,nearClip,farClip);
-        return matrixOutput;
-    }
-
-    public void getProjectionMatrix(
-            Matrix4f matrixOutput,
-            int nEye,
-            float nearClip,
-            float farClip) {
-        HmdMatrix44_t mat = vrsystem.GetProjectionMatrix.apply(nEye, nearClip, farClip, JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL);
-        OpenVRUtil.setSteamVRMatrix44ToMatrix4f(mat,matrixOutput);
-    }
 
     private static void initOpenVRCompositor(boolean set) throws Exception {
         if (set && vrsystem != null) {
@@ -200,21 +185,16 @@ public class VRProvider implements Runnable {
         texBounds.setAutoWrite(false);
         texBounds.write();
         // texture type
-        texType0.eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
-        texType0.eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
-        texType0.setAutoSynch(false);
-        texType0.setAutoRead(false);
-        texType0.setAutoWrite(false);
-        texType0.handle = -1;
-        texType0.write();
-        // texture type
-        texType1.eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
-        texType1.eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
-        texType1.setAutoSynch(false);
-        texType1.setAutoRead(false);
-        texType1.setAutoWrite(false);
-        texType1.handle = -1;
-        texType1.write();
+        for (int nEye = 0; nEye < 2; nEye++) {
+            texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
+            texType[0].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
+            texType[0].setAutoSynch(false);
+            texType[0].setAutoRead(false);
+            texType[0].setAutoWrite(false);
+            texType[0].handle = -1;
+            texType[0].write();
+
+        }
         System.out.println("OpenVR Compositor initialized OK.");
 
     }
@@ -327,7 +307,24 @@ public class VRProvider implements Runnable {
             return;
         vrsystem.TriggerHapticPulse.apply(controllerDeviceIndex[controller], 0, (short) strength);
     }
+    public void submitFrame() {
+        if(vrCompositor.Submit == null) return;
+
+        int ret = vrCompositor.Submit.apply(
+                JOpenVRLibrary.EVREye.EVREye_Eye_Left,
+                texType[0], null,
+                JOpenVRLibrary.EVRSubmitFlags.EVRSubmitFlags_Submit_Default);
+
+        int ret2 = vrCompositor.Submit.apply(
+                JOpenVRLibrary.EVREye.EVREye_Eye_Right,
+                texType[0], null,
+                JOpenVRLibrary.EVRSubmitFlags.EVRSubmitFlags_Submit_Default);
+
+        vrCompositor.PostPresentHandoff.apply();
+    }
+
     public void setNearClip(float _nearClip) { nearClip = _nearClip;}
+
     public void setFarClip(float _farClip) { farClip = _farClip;}
 
 }

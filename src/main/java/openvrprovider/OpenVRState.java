@@ -1,15 +1,14 @@
-package vrprovider;
+package openvrprovider;
 
 import jopenvr.*;
 import org.joml.Matrix4f;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by John on 7/29/2016.
+/* Contains all of the information that the user will need from OpenVR without using any OpenVR data structures. The
+OpenVRProvider automatically updates this.
  */
-public class VRState {
+public class OpenVRState {
     public static int LEFT_EYE = JOpenVRLibrary.EVREye.EVREye_Eye_Left;
     public static int RIGHT_EYE = JOpenVRLibrary.EVREye.EVREye_Eye_Right;
 
@@ -30,7 +29,7 @@ public class VRState {
     private static Matrix4f[] controllerPose = new Matrix4f[2];
     private static VRControllerState_t[] lastControllerState = new VRControllerState_t[2];
 
-    VRState() {
+    OpenVRState() {
         for (int c = 0; c < 2; c++) {
             lastControllerState[c] = new VRControllerState_t();
             controllerPose[c] = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
@@ -56,8 +55,12 @@ public class VRState {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, controllerPose[nIndex]);
     }
 
-    public Matrix4f getEyePose(HmdMatrix34_t inputPose, int nEye) {
+    public Matrix4f getEyePose(int nEye) {
         return headPose.mul(eyePoses[nEye]);
+    }
+
+    public Matrix4f getEyeProjectionMatrix(int nEye) {
+        return projectionMatrices[nEye];
     }
 
     public void updateControllerButtonState(

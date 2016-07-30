@@ -1,4 +1,4 @@
-package vrprovider;
+package openvrprovider;
 
 import jopenvr.HmdMatrix34_t;
 import jopenvr.HmdMatrix44_t;
@@ -6,9 +6,7 @@ import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author john
- */
+/* Utility functions that don't interact with the headset (conversions and the like) */
 public class OpenVRUtil {
 
     private static final long SLEEP_PRECISION = TimeUnit.MILLISECONDS.toNanos(4);

@@ -1,13 +1,11 @@
-package vrprovider;
+package openvrprovider;
 
 import jopenvr.VRControllerState_t;
 
-import static vrprovider.OpenVRUtil.switchedDown;
-import static vrprovider.OpenVRUtil.switchedUp;
+import static openvrprovider.OpenVRUtil.switchedDown;
+import static openvrprovider.OpenVRUtil.switchedUp;
 
-/**
- * Created by John on 7/29/2016.
- */
+/* Show how the controller listener works. */
 public class SampleControllerListener implements ControllerListener {
     @Override
     public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController) {

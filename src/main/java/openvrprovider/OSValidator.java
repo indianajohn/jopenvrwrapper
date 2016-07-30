@@ -1,8 +1,6 @@
-package vrprovider;
+package openvrprovider;
 
-/**
- * Created by john on 7/29/16.
- */
+/* Mainly used to locate the OpenVR library on different platforms. */
 public class OSValidator {
     private static final String OS = System.getProperty("os.name").toLowerCase();
     private static final String arch = System.getProperty("os.arch");
