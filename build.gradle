@@ -1,0 +1,48 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+apply plugin: 'idea'
+
+mainClassName = 'vrprovider.HelloWorld'
+
+// tag::repositories[]
+repositories {
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+// end::repositories[]
+
+// tag::jar[]
+jar {
+    baseName = 'gs-gradle'
+    version =  '0.1.0'
+}
+// end::jar[]
+
+// tag::dependencies[]
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+project.ext.lwjglVersion = "3.0.0a"
+project.ext.jomlVersion = "1.8.1"
+dependencies {
+    compile "joda-time:joda-time:2.2"
+    // https://mvnrepository.com/artifact/net.java.dev.jna/platform
+    compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.0'
+
+    // lwgl
+    compile "org.lwjgl:lwjgl:${lwjglVersion}"
+    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-windows"
+    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-linux"
+    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-osx"
+    compile "org.joml:joml:${jomlVersion}"
+}
+// end::dependencies[]
+
+// tag::wrapper[]
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+// end::wrapper[]
