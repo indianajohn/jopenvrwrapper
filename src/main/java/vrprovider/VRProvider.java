@@ -5,6 +5,7 @@ import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
 import jopenvr.*;
 import jopenvr.JOpenVRLibrary.EVREventType;
+import org.joml.Matrix4f;
 
 import java.nio.IntBuffer;
 
@@ -25,6 +26,8 @@ public class VRProvider implements Runnable {
     private static TrackedDevicePose_t.ByReference hmdTrackedDevicePoseReference;
     private static TrackedDevicePose_t[] hmdTrackedDevicePoses;
     // TextureIDs of framebuffers for each eye
+    private float nearClip = 0.5f;
+    private float farClip = 500.0f;
     private final static VRTextureBounds_t texBounds = new VRTextureBounds_t();
     private final static Texture_t texType0 = new Texture_t();
     private final static Texture_t texType1 = new Texture_t();
@@ -153,6 +156,23 @@ public class VRProvider implements Runnable {
             throw new Exception(jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0));
         }
     }
+    private Matrix4f getProjectionMatrix(
+            int nEye,
+            float nearClip,
+            float farClip) {
+        Matrix4f matrixOutput = new Matrix4f();
+        getProjectionMatrix(matrixOutput,nEye,nearClip,farClip);
+        return matrixOutput;
+    }
+
+    public void getProjectionMatrix(
+            Matrix4f matrixOutput,
+            int nEye,
+            float nearClip,
+            float farClip) {
+        HmdMatrix44_t mat = vrsystem.GetProjectionMatrix.apply(nEye, nearClip, farClip, JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL);
+        OpenVRUtil.setSteamVRMatrix44ToMatrix4f(mat,matrixOutput);
+    }
 
     private static void initOpenVRCompositor(boolean set) throws Exception {
         if (set && vrsystem != null) {
@@ -278,10 +298,12 @@ public class VRProvider implements Runnable {
         }
 
         if (hmdTrackedDevicePoses[JOpenVRLibrary.k_unTrackedDeviceIndex_Hmd].bPoseIsValid != 0) {
-            HmdMatrix34_t matL = vrsystem.GetEyeToHeadTransform.apply(JOpenVRLibrary.EVREye.EVREye_Eye_Left);
-            vrState.setLeftEyePoseWRTHead(matL);
-            HmdMatrix34_t matR = vrsystem.GetEyeToHeadTransform.apply(JOpenVRLibrary.EVREye.EVREye_Eye_Right);
-            vrState.setRightEyePoseWRTHead(matR);
+            for (int nEye = 0; nEye < 2; nEye++) {
+                HmdMatrix34_t matPose = vrsystem.GetEyeToHeadTransform.apply(nEye);
+                vrState.setEyePoseWRTHead(matPose,nEye);
+                HmdMatrix44_t matProjection = vrsystem.GetProjectionMatrix.apply(nEye, nearClip, farClip, JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL);
+                vrState.setProjectionMatrix(matProjection,nEye);
+            }
             vrState.setHeadPose(hmdTrackedDevicePoses[JOpenVRLibrary.k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
             headIsTracking = true;
         } else {
@@ -305,5 +327,7 @@ public class VRProvider implements Runnable {
             return;
         vrsystem.TriggerHapticPulse.apply(controllerDeviceIndex[controller], 0, (short) strength);
     }
+    public void setNearClip(float _nearClip) { nearClip = _nearClip;}
+    public void setFarClip(float _farClip) { farClip = _farClip;}
 
 }

@@ -1,21 +1,18 @@
 package vrprovider;
 
-import jopenvr.HmdMatrix34_t;
-import jopenvr.VRControllerAxis_t;
-import jopenvr.VRControllerState_t;
+import jopenvr.*;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static vrprovider.ControllerListener.LEFT_CONTROLLER;
-import static vrprovider.ControllerListener.RIGHT_CONTROLLER;
-
-
 /**
  * Created by John on 7/29/2016.
  */
 public class VRState {
+    public static int LEFT_EYE = JOpenVRLibrary.EVREye.EVREye_Eye_Left;
+    public static int RIGHT_EYE = JOpenVRLibrary.EVREye.EVREye_Eye_Right;
+
     private List<ControllerListener> controllerListeners = new ArrayList<>();
 
     public void addControllerListener(ControllerListener toAdd) {
@@ -23,8 +20,8 @@ public class VRState {
     }
 
     // In the head frame
-    private Matrix4f leftEyePose = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-    private Matrix4f rightEyePose = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    private Matrix4f[] eyePoses = new Matrix4f[2];
+    private Matrix4f[] projectionMatrices = new Matrix4f[2];
 
     // In the tracking system intertial frame
     private Matrix4f headPose = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -36,11 +33,13 @@ public class VRState {
     VRState() {
         for (int c = 0; c < 2; c++) {
             lastControllerState[c] = new VRControllerState_t();
+            controllerPose[c] = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+            eyePoses[c] = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+            projectionMatrices[c] = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+
             for (int i = 0; i < 5; i++) {
                 lastControllerState[c].rAxis[i] = new VRControllerAxis_t();
-                controllerPose[c] = new Matrix4f();
             }
-
         }
 
     }
@@ -49,32 +48,16 @@ public class VRState {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, headPose);
     }
 
-    public void setLeftEyePoseWRTHead(HmdMatrix34_t inputPose) {
-        OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, leftEyePose);
-    }
-
-    public void setRightEyePoseWRTHead(HmdMatrix34_t inputPose) {
-        OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, rightEyePose);
-    }
-
-    public void setLeftControllerPose(HmdMatrix34_t inputPose) {
-        setControllerPose(inputPose, LEFT_CONTROLLER);
-    }
-
-    public void setRightControllerPose(HmdMatrix34_t inputPose) {
-        setControllerPose(inputPose, RIGHT_CONTROLLER);
+    public void setEyePoseWRTHead(HmdMatrix34_t inputPose, int nIndex) {
+        OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, eyePoses[nIndex]);
     }
 
     public void setControllerPose(HmdMatrix34_t inputPose, int nIndex) {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, controllerPose[nIndex]);
     }
 
-    public Matrix4f getRightEyePose(HmdMatrix34_t inputPose) {
-        return headPose.mul(rightEyePose);
-    }
-
-    public Matrix4f getLeftEyePose(HmdMatrix34_t inputPose) {
-        return headPose.mul(leftEyePose);
+    public Matrix4f getEyePose(HmdMatrix34_t inputPose, int nEye) {
+        return headPose.mul(eyePoses[nEye]);
     }
 
     public void updateControllerButtonState(
@@ -99,6 +82,12 @@ public class VRState {
                 }
             }
         }
+    }
+
+    public void setProjectionMatrix(
+            HmdMatrix44_t inputPose,
+            int nEye) {
+        OpenVRUtil.setSteamVRMatrix44ToMatrix4f(inputPose, projectionMatrices[nEye]);
     }
 
 }
