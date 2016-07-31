@@ -41,7 +41,7 @@ public class HelloWorld {
     }
 
     private void init() {
-        // opengl and window setup
+        // OpenGL and window setup
         // ...
         // OPENVR: Disable v-sync. This is important for VR to get high frame rates.
         glfwSwapInterval(0);
