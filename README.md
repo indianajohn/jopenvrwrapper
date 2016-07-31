@@ -33,6 +33,67 @@ underlying C API calls. The basic usage is:
 This process is demonstrated in examples/HelloWorld.java. Relevant parts are
 taggged with "OPENVR:".
 
+```Java
+public class HelloWorld {
+        public void run() {
+            init();
+            loop();
+    }
+
+    private void init() {
+        // opengl and window setup
+        // ...
+        // OPENVR: Disable v-sync. This is important for VR to get high frame rates.
+        glfwSwapInterval(0);
+        // ...
+    }
+
+    private void loop() {
+        // Create the OpenGL context
+        GLContext.createFromCurrent();
+        // ...
+
+        // OPENVR: create the rendering context for the eyes.
+        // This object must be constructed after a valid GLContext exists.
+        vrRenderer = new OpenVRStereoRenderer(vrProvider,1280,720);
+
+        // ...
+
+        double fTime = getTime();
+        while ( glfwWindowShouldClose(window) == GL_FALSE ) {
+            for (int nEye = 0; nEye < 2; nEye++)
+            {
+                // OPENVR: bind the VAO associated with the target eye
+                EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
+
+                // tell OpenGL to use the shader
+                GL20.glUseProgram(shader.getProgramId());
+                // ...
+                // rendering code
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        // OPENVR: object initialization.
+        OpenVRProvider provider = new OpenVRProvider();
+        try {
+            // OpenVR: add a controller listener. Could also be this class if we wanted.
+            provider.vrState.addControllerListener(new SampleControllerListener());
+            Thread vrPoller = new Thread(provider, "vrPoller");
+            vrPoller.start();
+            SharedLibraryLoader.load();
+            HelloWorld app = new HelloWorld();
+            app.setVRProvider(provider);
+            app.run();
+            vrPoller.join();
+        } catch (Exception e) {
+            System.out.println("Unhandled exception: " + e.toString());
+        }
+        System.out.println("Exited normally.");"
+}
+```
+
 A build.gradle file is included as well as a pre-made gradle wrapper; on any
 machine with the JDK on it, running this should be as simple as running
 
