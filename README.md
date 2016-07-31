@@ -66,8 +66,6 @@ public class HelloWorld {
                 // OPENVR: bind the VAO associated with the target eye
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
 
-                // tell OpenGL to use the shader
-                GL20.glUseProgram(shader.getProgramId());
                 // ...
                 // rendering code
 
