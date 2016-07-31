@@ -93,11 +93,15 @@ public class HelloWorld {
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(window);
-        // Enable v-sync
-        glfwSwapInterval(1);
+        // Disable v-sync
+        glfwSwapInterval(0);
 
         // Make the window visible
         glfwShowWindow(window);
+    }
+
+    public double getTime() {
+        return System.nanoTime() / 1000000000;
     }
 
     private void loop() {
@@ -127,11 +131,16 @@ public class HelloWorld {
 
         vrRenderer = new OpenVRStereoRenderer(vrProvider,1280,720);
 
-        // Set the clear color
+        long nFrames = 0;
+        double fTime = getTime();
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
+            nFrames++;
+            double fps = nFrames / (getTime() - fTime);
+            if (nFrames % 1000 == 0)
+                System.out.println("FPS: " + fps);
             for (int nEye = 0; nEye < 2; nEye++)
             {
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
