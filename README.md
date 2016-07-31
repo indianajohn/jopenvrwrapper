@@ -95,7 +95,7 @@ public class HelloWorld {
 }
 ```
 
-A build.gradle file is included as well as a pre-made gradle wrapper; on any
+A build.gradle file is included as well as a pre-made Gradle wrapper; on any
 machine with the JDK on it, running this should be as simple as running
 
 ```
@@ -106,4 +106,8 @@ Or, for IDE support:
 
 ```
 ./gradlew idea
+```
+
+```
+./gradlew eclipse
 ```
