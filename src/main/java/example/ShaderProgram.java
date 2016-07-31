@@ -8,17 +8,16 @@ import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+
 import static org.lwjgl.opengl.GL20.*;
 
-public class ShaderProgram
-{
+public class ShaderProgram {
     // OpenGL handle that will point to the executable shader program
     // that can later be used for rendering
     private int programId;
     protected static FloatBuffer buf16Pool;
 
-    public void init(String vertexShaderFilename, String fragmentShaderFilename)
-    {
+    public void init(String vertexShaderFilename, String fragmentShaderFilename) {
         // create the shader program. If OK, create vertex and fragment shaders
         programId = glCreateProgram();
 
@@ -34,16 +33,14 @@ public class ShaderProgram
         glLinkProgram(programId);
 
         // validate linking
-        if (glGetProgrami(programId, GL_LINK_STATUS) == GL11.GL_FALSE)
-        {
+        if (glGetProgrami(programId, GL_LINK_STATUS) == GL11.GL_FALSE) {
             throw new RuntimeException("could not link shader. Reason: " + glGetProgramInfoLog(programId, 1000));
         }
 
         // perform general validation that the program is usable
         glValidateProgram(programId);
 
-        if (glGetProgrami(programId, GL_VALIDATE_STATUS) == GL11.GL_FALSE)
-        {
+        if (glGetProgrami(programId, GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
             throw new RuntimeException("could not validate shader. Reason: " + glGetProgramInfoLog(programId, 1000));
         }
     }
@@ -53,14 +50,12 @@ public class ShaderProgram
      * is the same.
      * @param the name and path to the vertex shader
      */
-    private int loadAndCompileShader(String filename, int shaderType)
-    {
+    private int loadAndCompileShader(String filename, int shaderType) {
         //vertShader will be non zero if succefully created
         int handle = glCreateShader(shaderType);
 
-        if( handle == 0 )
-        {
-            throw new RuntimeException("could not created shader of type "+shaderType+" for file "+filename+". "+ glGetProgramInfoLog(programId, 1000));
+        if (handle == 0) {
+            throw new RuntimeException("could not created shader of type " + shaderType + " for file " + filename + ". " + glGetProgramInfoLog(programId, 1000));
         }
 
         // load code from file into String
@@ -76,9 +71,8 @@ public class ShaderProgram
         int shaderStatus = glGetShaderi(handle, GL20.GL_COMPILE_STATUS);
 
         // check whether compilation was successful
-        if( shaderStatus == GL11.GL_FALSE)
-        {
-            throw new IllegalStateException("compilation error for shader ["+filename+"]. Reason: " + glGetShaderInfoLog(handle, 1000));
+        if (shaderStatus == GL11.GL_FALSE) {
+            throw new IllegalStateException("compilation error for shader [" + filename + "]. Reason: " + glGetShaderInfoLog(handle, 1000));
         }
 
         return handle;
@@ -87,22 +81,17 @@ public class ShaderProgram
     /**
      * Load a text file and return it as a String.
      */
-    private String loadFile(String filename)
-    {
+    private String loadFile(String filename) {
         StringBuilder vertexCode = new StringBuilder();
-        String line = null ;
-        try
-        {
+        String line = null;
+        try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
-            while( (line = reader.readLine()) !=null )
-            {
+            while ((line = reader.readLine()) != null) {
                 vertexCode.append(line);
                 vertexCode.append('\n');
             }
-        }
-        catch(Exception e)
-        {
-            throw new IllegalArgumentException("unable to load shader from file ["+filename+"]", e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("unable to load shader from file [" + filename + "]", e);
         }
 
         return vertexCode.toString();
@@ -110,6 +99,7 @@ public class ShaderProgram
 
     /**
      * Gets the location of the specified uniform name.
+     *
      * @param str the name of the uniform
      * @return the location of the uniform in this program
      */
@@ -124,27 +114,29 @@ public class ShaderProgram
 
     /**
      * Sets the uniform data at the specified location (the uniform type may be int, bool or sampler2D).
+     *
      * @param loc the location of the int/bool/sampler2D uniform
-     * @param i the value to set
+     * @param i   the value to set
      */
     public void setUniformi(int loc, int i) {
-        if (loc==-1) return;
+        if (loc == -1) return;
         glUniform1i(loc, i);
     }
 
     public void setUniformf(int loc, float f) {
-        if (loc==-1) return;
+        if (loc == -1) return;
         glUniform1f(loc, f);
     }
 
     /**
      * Sends a 4x4 matrix to the shader program.
-     * @param loc the location of the mat4 uniform
+     *
+     * @param loc        the location of the mat4 uniform
      * @param transposed whether the matrix should be transposed
-     * @param mat the matrix to send
+     * @param mat        the matrix to send
      */
     public void setUniformMatrix(int loc, boolean transposed, Matrix4f mat) {
-        if (loc==-1) return;
+        if (loc == -1) return;
         if (buf16Pool == null)
             buf16Pool = BufferUtils.createFloatBuffer(16);
         buf16Pool.clear();
@@ -155,17 +147,18 @@ public class ShaderProgram
     public boolean setUniformi(String name, int i) {
         int loc = getUniformLocation(name);
         if (loc >= 0)
-            setUniformi(loc,i);
+            setUniformi(loc, i);
         else {
             System.out.println("Warning: tried to set an invalid integer uniform.");
             return false;
         }
         return true;
     }
+
     public boolean setUniformf(String name, float f) {
         int loc = getUniformLocation(name);
         if (loc >= 0)
-            setUniformf(loc,f);
+            setUniformf(loc, f);
         else {
             System.out.println("Warning: tried to set an invalid float uniform.");
             return false;
@@ -176,9 +169,8 @@ public class ShaderProgram
     public boolean setUniformMatrix(String name, boolean transposed, Matrix4f mat) {
         int loc = getUniformLocation(name);
         if (loc >= 0) {
-            setUniformMatrix(loc,transposed,mat);
-        }
-        else {
+            setUniformMatrix(loc, transposed, mat);
+        } else {
             System.out.println("Warning: tried to set an invalid uniform matrix.");
             return false;
         }

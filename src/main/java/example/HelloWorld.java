@@ -21,14 +21,16 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class HelloWorld {
     // Window stuff
     private GLFWErrorCallback errorCallback;
-    private GLFWKeyCallback   keyCallback;
+    private GLFWKeyCallback keyCallback;
     private long window;
     private OpenVRProvider vrProvider;
     private OpenVRStereoRenderer vrRenderer;
     static final int WIDTH = 1280;
     static final int HEIGHT = 720;
 
-    public void setVRProvider(OpenVRProvider _vrProvider) { vrProvider = _vrProvider;}
+    public void setVRProvider(OpenVRProvider _vrProvider) {
+        vrProvider = _vrProvider;
+    }
 
     public void run() {
         System.out.println("LWJGL " + Sys.getVersion() + "!");
@@ -46,7 +48,7 @@ public class HelloWorld {
     private void init() {
         // Window init.
         glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
-        if ( glfwInit() != GL11.GL_TRUE )
+        if (glfwInit() != GL11.GL_TRUE)
             throw new IllegalStateException("Unable to initialize GLFW");
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
@@ -56,12 +58,12 @@ public class HelloWorld {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         window = glfwCreateWindow(WIDTH, HEIGHT, "OpenVR wrapper test", NULL, NULL);
-        if ( window == NULL )
+        if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
-                if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
+                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
                     glfwSetWindowShouldClose(window, GL_TRUE); // We will detect this in our rendering loop
             }
         });
@@ -95,26 +97,25 @@ public class HelloWorld {
         // Create and link shader
         ShaderProgram shader = new ShaderProgram();
         String userDir = System.getProperty("user.dir");
-        shader.init(userDir + "/shaders/HelloWorld.glslv",userDir + "/shaders/HelloWorld.glslf");
+        shader.init(userDir + "/shaders/HelloWorld.glslv", userDir + "/shaders/HelloWorld.glslf");
 
         // OPENVR: create the rendering context for the eyes.
         // This object must be constructed after a valid GLContext exists.
-        vrRenderer = new OpenVRStereoRenderer(vrProvider,WIDTH,HEIGHT);
+        vrRenderer = new OpenVRStereoRenderer(vrProvider, WIDTH, HEIGHT);
 
         // the window or has pressed the ESCAPE key.
         long nFrames = 0;
         double fTime = getTime();
-        while ( glfwWindowShouldClose(window) == GL_FALSE ) {
+        while (glfwWindowShouldClose(window) == GL_FALSE) {
             // Show FPS
             nFrames++;
             double fps = nFrames / (getTime() - fTime);
             if (nFrames % 1000 == 0)
                 System.out.println("FPS: " + fps);
 
-            for (int nEye = 0; nEye < 2; nEye++)
-            {
+            for (int nEye = 0; nEye < 2; nEye++) {
                 // OPENVR: bind the VAO associated with the target eye
-                EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
+                EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
 
                 // tell OpenGL to use the shader
                 GL20.glUseProgram(shader.getProgramId());
@@ -125,7 +126,7 @@ public class HelloWorld {
 
                 // Bind shader
                 Matrix4f matMVP = vrProvider.vrState.getEyeProjectionMatrix(nEye).mul(vrProvider.vrState.getEyePose(nEye));
-                shader.setUniformMatrix("MVP",false,matMVP);
+                shader.setUniformMatrix("MVP", false, matMVP);
 
                 // bind vertex and color data
                 GL30.glBindVertexArray(vaoHandle);
@@ -145,17 +146,16 @@ public class HelloWorld {
         }
     }
 
-    private int constructVertexArrayObject()
-    {
-        float[] positionData = new float[] {
-                1f,		-1f,		0f,
-                -1f,	0f, 	0f,
-                0f,		1f,		0f
+    private int constructVertexArrayObject() {
+        float[] positionData = new float[]{
+                1f, -1f, 0f,
+                -1f, 0f, 0f,
+                0f, 1f, 0f
         };
         float[] colorData = new float[]{
-                0f,			0f,			1f,
-                1f,			0f,			0f,
-                0f,			1f,			0f
+                0f, 0f, 1f,
+                1f, 0f, 0f,
+                0f, 1f, 0f
         };
         FloatBuffer positionBuffer = BufferUtils.createFloatBuffer(positionData.length);
         positionBuffer.put(positionData);

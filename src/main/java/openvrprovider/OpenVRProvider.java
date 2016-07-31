@@ -5,6 +5,7 @@ import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
 import jopenvr.*;
 import jopenvr.JOpenVRLibrary.EVREventType;
+
 import java.nio.IntBuffer;
 
 import static openvrprovider.ControllerListener.LEFT_CONTROLLER;
@@ -280,9 +281,9 @@ public class OpenVRProvider implements Runnable {
         if (hmdTrackedDevicePoses[JOpenVRLibrary.k_unTrackedDeviceIndex_Hmd].bPoseIsValid != 0) {
             for (int nEye = 0; nEye < 2; nEye++) {
                 HmdMatrix34_t matPose = vrsystem.GetEyeToHeadTransform.apply(nEye);
-                vrState.setEyePoseWRTHead(matPose,nEye);
+                vrState.setEyePoseWRTHead(matPose, nEye);
                 HmdMatrix44_t matProjection = vrsystem.GetProjectionMatrix.apply(nEye, nearClip, farClip, JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL);
-                vrState.setProjectionMatrix(matProjection,nEye);
+                vrState.setProjectionMatrix(matProjection, nEye);
             }
             vrState.setHeadPose(hmdTrackedDevicePoses[JOpenVRLibrary.k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
             headIsTracking = true;
@@ -307,9 +308,10 @@ public class OpenVRProvider implements Runnable {
             return;
         vrsystem.TriggerHapticPulse.apply(controllerDeviceIndex[controller], 0, (short) strength);
     }
+
     public void submitFrame() {
         if (vrCompositor == null) return;
-        if(vrCompositor.Submit == null) return;
+        if (vrCompositor.Submit == null) return;
         for (int nEye = 0; nEye < 2; nEye++) {
             int ret = vrCompositor.Submit.apply(
                     nEye,
@@ -319,8 +321,12 @@ public class OpenVRProvider implements Runnable {
         vrCompositor.PostPresentHandoff.apply();
     }
 
-    public void setNearClip(float _nearClip) { nearClip = _nearClip;}
+    public void setNearClip(float _nearClip) {
+        nearClip = _nearClip;
+    }
 
-    public void setFarClip(float _farClip) { farClip = _farClip;}
+    public void setFarClip(float _farClip) {
+        farClip = _farClip;
+    }
 
 }
