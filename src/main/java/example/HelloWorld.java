@@ -2,11 +2,13 @@ package example;
 
 import openvrprovider.OpenVRProvider;
 import openvrprovider.OpenVRStereoRenderer;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -59,8 +61,8 @@ public class HelloWorld {
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
         int WIDTH = 300;
         int HEIGHT = 300;
@@ -105,13 +107,31 @@ public class HelloWorld {
         // bindings available for use.
         GLContext.createFromCurrent();
 
-        vrRenderer = new OpenVRStereoRenderer(vrProvider,1080,1200);
+        // compile and link vertex and fragment shaders into
+        // a "program" that resides in the OpenGL driver
+        ShaderProgram shader = new ShaderProgram();
+
+        // do the heavy lifting of loading, compiling and linking
+        // the two shaders into a usable shader program
+        String userDir = System.getProperty("user.dir");
+
+
+        int vaoHandle = constructVertexArrayObject();
+
+        // Need to bind VAO before linking shader
+        GL30.glBindVertexArray(vaoHandle);
+        GL20.glEnableVertexAttribArray(0); // VertexPosition
+        GL20.glEnableVertexAttribArray(1); // VertexColor
+        shader.init(userDir + "/shaders/HelloWorld.glslv",userDir + "/shaders/HelloWorld.glslf");
+
+        //vrRenderer = new OpenVRStereoRenderer(vrProvider,1080,1200);
 
         // Set the clear color
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
+            /*
             for (int nEye = 0; nEye < 2; nEye++)
             {
                 System.out.println(vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
@@ -121,8 +141,21 @@ public class HelloWorld {
             }
             vrProvider.submitFrame();
             EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
-            glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+            */
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
+            // tell OpenGL to use the shader
+            GL20.glUseProgram( shader.getProgramId() );
+
+            // bind vertex and color data
+            GL30.glBindVertexArray(vaoHandle);
+            GL20.glEnableVertexAttribArray(0); // VertexPosition
+            GL20.glEnableVertexAttribArray(1); // VertexColor
+
+            // draw VAO
+            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
+
 
             glfwSwapBuffers(window); // swap the color buffers
 
@@ -130,6 +163,65 @@ public class HelloWorld {
             // invoked during this call.
             glfwPollEvents();
         }
+    }
+
+    private int constructVertexArrayObject()
+    {
+        // create vertex data
+        float[] positionData = new float[] {
+                0f,		0f,		0f,
+                -1f,	0f, 	0f,
+                0f,		1f,		0f
+        };
+
+        // create color data
+        float[] colorData = new float[]{
+                0f,			0f,			1f,
+                1f,			0f,			0f,
+                0f,			1f,			0f
+        };
+
+        // convert vertex array to buffer
+        FloatBuffer positionBuffer = BufferUtils.createFloatBuffer(positionData.length);
+        positionBuffer.put(positionData);
+        positionBuffer.flip();
+
+        // convert color array to buffer
+        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(colorData.length);
+        colorBuffer.put(colorData);
+        colorBuffer.flip();
+
+        // create vertex byffer object (VBO) for vertices
+        int positionBufferHandle = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionBufferHandle);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, positionBuffer, GL15.GL_STATIC_DRAW);
+
+        // create VBO for color values
+        int colorBufferHandle = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, colorBufferHandle);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorBuffer, GL15.GL_STATIC_DRAW);
+
+        // unbind VBO
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
+        // create vertex array object (VAO)
+        int vaoHandle = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(vaoHandle);
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
+
+        // assign vertex VBO to slot 0 of VAO
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionBufferHandle);
+        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
+
+        // assign vertex VBO to slot 1 of VAO
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, colorBufferHandle);
+        GL20.glVertexAttribPointer(1, 3, GL11.GL_FLOAT, false, 0, 0);
+
+        // unbind VBO
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
+        return vaoHandle;
     }
 
     public static void main(String[] args) {
