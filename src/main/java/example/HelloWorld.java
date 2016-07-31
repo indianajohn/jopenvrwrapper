@@ -123,7 +123,8 @@ public class HelloWorld {
                 glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-                // Bind shader
+                // OPENVR: get rendering transformations
+                // Get projection and pose matrices from OpenVR.
                 Matrix4f matMVP = vrProvider.vrState.getEyeProjectionMatrix(nEye).mul(vrProvider.vrState.getEyePose(nEye));
                 shader.setUniformMatrix("MVP", false, matMVP);
 
@@ -135,7 +136,6 @@ public class HelloWorld {
                 // draw VAO
                 GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
                 vrProvider.submitFrame();
-
 
                 // Window management
                 glfwSwapBuffers(window);
