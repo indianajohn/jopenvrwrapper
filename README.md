@@ -94,8 +94,8 @@ public class HelloWorld {
 }
 ```
 
-A build.gradle file is included as well as a pre-made Gradle wrapper; on any
-machine with the JDK on it, running this should be as simple as running
+A `build.gradle` file is included as well as a pre-made Gradle wrapper; on any
+machine with the JDK on it, running this should be as simple as running:
 
 ```
 ./gradlew run
