@@ -308,18 +308,14 @@ public class OpenVRProvider implements Runnable {
         vrsystem.TriggerHapticPulse.apply(controllerDeviceIndex[controller], 0, (short) strength);
     }
     public void submitFrame() {
+        if (vrCompositor == null) return;
         if(vrCompositor.Submit == null) return;
-
-        int ret = vrCompositor.Submit.apply(
-                JOpenVRLibrary.EVREye.EVREye_Eye_Left,
-                texType[0], null,
-                JOpenVRLibrary.EVRSubmitFlags.EVRSubmitFlags_Submit_Default);
-
-        int ret2 = vrCompositor.Submit.apply(
-                JOpenVRLibrary.EVREye.EVREye_Eye_Right,
-                texType[0], null,
-                JOpenVRLibrary.EVRSubmitFlags.EVRSubmitFlags_Submit_Default);
-
+        for (int nEye = 0; nEye < 2; nEye++) {
+            int ret = vrCompositor.Submit.apply(
+                    nEye,
+                    texType[nEye], null,
+                    JOpenVRLibrary.EVRSubmitFlags.EVRSubmitFlags_Submit_Default);
+        }
         vrCompositor.PostPresentHandoff.apply();
     }
 
