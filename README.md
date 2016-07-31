@@ -70,6 +70,9 @@ public class HelloWorld {
                 GL20.glUseProgram(shader.getProgramId());
                 // ...
                 // rendering code
+
+                // OPENVR: submit frame
+                vrProvider.submitFrame();
             }
         }
     }
