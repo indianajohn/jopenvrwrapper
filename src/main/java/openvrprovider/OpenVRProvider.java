@@ -303,7 +303,7 @@ public class OpenVRProvider implements Runnable {
         }
     }
 
-    static void triggerHapticPulse(int controller, int strength) {
+    public static void triggerHapticPulse(int controller, int strength) {
         if (controllerDeviceIndex[controller] == -1)
             return;
         vrsystem.TriggerHapticPulse.apply(controllerDeviceIndex[controller], 0, (short) strength);
