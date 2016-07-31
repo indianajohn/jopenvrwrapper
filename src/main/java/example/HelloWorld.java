@@ -65,8 +65,8 @@ public class HelloWorld {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-        int WIDTH = 300;
-        int HEIGHT = 300;
+        int WIDTH = 1280;
+        int HEIGHT = 720;
 
         // Create the window
         window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
@@ -125,7 +125,7 @@ public class HelloWorld {
         GL20.glEnableVertexAttribArray(1); // VertexColor
         shader.init(userDir + "/shaders/HelloWorld.glslv",userDir + "/shaders/HelloWorld.glslf");
 
-        vrRenderer = new OpenVRStereoRenderer(vrProvider,1080,1200);
+        vrRenderer = new OpenVRStereoRenderer(vrProvider,1280,720);
 
         // Set the clear color
 
@@ -135,33 +135,47 @@ public class HelloWorld {
             for (int nEye = 0; nEye < 2; nEye++)
             {
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
+
                 // tell OpenGL to use the shader
-                GL20.glUseProgram( shader.getProgramId() );
-                Matrix4f matMVP = vrProvider.vrState.getEyePose(0).mul(vrProvider.vrState.getEyeProjectionMatrix(0));
-                shader.setUniformMatrix("MVP",false,matMVP);
-                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                GL20.glUseProgram(shader.getProgramId());
+
+                glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
+                Matrix4f matMVP = vrProvider.vrState.getEyeProjectionMatrix(nEye).mul(vrProvider.vrState.getEyePose(nEye));
+                shader.setUniformMatrix("MVP",false,matMVP);
+
                 // bind vertex and color data
                 GL30.glBindVertexArray(vaoHandle);
                 GL20.glEnableVertexAttribArray(0); // VertexPosition
                 GL20.glEnableVertexAttribArray(1); // VertexColor
+
                 // draw VAO
                 GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
             }
             vrProvider.submitFrame();
-            // tell OpenGL to use the shader
-            Matrix4f matMVP = vrProvider.vrState.getEyePose(0).mul(vrProvider.vrState.getEyeProjectionMatrix(0));
-            shader.setUniformMatrix("MVP",false,matMVP);
-            GL20.glUseProgram( shader.getProgramId() );
-            EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
+            EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
+
+            // tell OpenGL to use the shader
+            GL20.glUseProgram( shader.getProgramId() );
+
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
+            Matrix4f matMVP = vrProvider.vrState.getEyeProjectionMatrix(1).mul(vrProvider.vrState.getEyePose(1));
+            shader.setUniformMatrix("MVP",false,matMVP);
+
             // bind vertex and color data
             GL30.glBindVertexArray(vaoHandle);
             GL20.glEnableVertexAttribArray(0); // VertexPosition
             GL20.glEnableVertexAttribArray(1); // VertexColor
+
             // draw VAO
             GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
+
             glfwSwapBuffers(window); // swap the color buffers
             // Poll for window events. The key callback above will only be
             // invoked during this call.
@@ -173,7 +187,7 @@ public class HelloWorld {
     {
         // create vertex data
         float[] positionData = new float[] {
-                0f,		0f,		0f,
+                1f,		-1f,		0f,
                 -1f,	0f, 	0f,
                 0f,		1f,		0f
         };
