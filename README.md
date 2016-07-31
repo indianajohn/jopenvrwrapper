@@ -18,7 +18,7 @@ The package is designed to insulate the user from making calls to OpenVR
 directly to avoid the need to deal with native data structures or debug the
 underlying C API calls. The basic usage is:
 
-1. Instantiate OpenVRPRovider.
+1. Instantiate OpenVRProvider.
 
 2. Register any classes that you would like as ControllerListener implementers.
 
