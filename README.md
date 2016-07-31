@@ -30,7 +30,8 @@ underlying C API calls. The basic usage is:
   your shaders, render, call glFinish() and any other frame clean up code, and
   then do the same for the right eye.
 
-This process is demonstrated in examples/HelloWorld.java.
+This process is demonstrated in examples/HelloWorld.java. Relevant parts are
+taggged with "OPENVR:".
 
 A build.gradle file is included as well as a pre-made gradle wrapper; on any
 machine with the JDK on it, running this should be as simple as running
