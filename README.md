@@ -18,20 +18,20 @@ The package is designed to insulate the user from making calls to OpenVR
 directly to avoid the need to deal with native data structures or debug the
 underlying C API calls. The basic usage is:
 
-1. Instantiate OpenVRProvider.
+1. Instantiate `OpenVRProvider`.
 
-2. Register any classes that you would like as ControllerListener implementers.
+2. Register any classes that you would like as `ControllerListener` implementers.
 
-3. Instantiate OpenVRStereoRenderer in your render thread after creating your
+3. Instantiate `OpenVRStereoRenderer` in your render thread after creating your
    OpenGL context.
 
 4. Every iteration of your render thread, bind the left eye frame buffer,
   retrieve the projection matrix and pose matrix for the left eye, pass them to
-  your shaders, render, call glFinish() and any other frame clean up code, and
+  your shaders, render, call `glFinish()` and any other frame clean up code, and
   then do the same for the right eye.
 
-This process is demonstrated in examples/HelloWorld.java. Relevant parts are
-taggged with "OPENVR:".
+This process is demonstrated in `examples/HelloWorld.java`. Relevant parts are
+taggged with `OPENVR:`.
 
 ```Java
 public class HelloWorld {
