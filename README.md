@@ -59,7 +59,6 @@ public class HelloWorld {
 
         // ...
 
-        double fTime = getTime();
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
             for (int nEye = 0; nEye < 2; nEye++)
             {
