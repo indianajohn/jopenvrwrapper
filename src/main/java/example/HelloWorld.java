@@ -133,30 +133,26 @@ public class HelloWorld {
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
             for (int nEye = 0; nEye < 2; nEye++)
             {
+                // tell OpenGL to use the shader
+                GL20.glUseProgram( shader.getProgramId() );
                 shader.setUniformMatrix("MVP",false,vrProvider.vrState.getEyePose(nEye).mul(vrProvider.vrState.getEyeProjectionMatrix(nEye)));
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
                 glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+                // bind vertex and color data
+                GL30.glBindVertexArray(vaoHandle);
+                GL20.glEnableVertexAttribArray(0); // VertexPosition
+                GL20.glEnableVertexAttribArray(1); // VertexColor
+                // draw VAO
+                GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
             }
             vrProvider.submitFrame();
+            // tell OpenGL to use the shader
+            GL20.glUseProgram( shader.getProgramId() );
             EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
-            // tell OpenGL to use the shader
-            GL20.glUseProgram( shader.getProgramId() );
-
-            // bind vertex and color data
-            GL30.glBindVertexArray(vaoHandle);
-            GL20.glEnableVertexAttribArray(0); // VertexPosition
-            GL20.glEnableVertexAttribArray(1); // VertexColor
-
-            // draw VAO
-            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
-
-
             glfwSwapBuffers(window); // swap the color buffers
-
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents();
