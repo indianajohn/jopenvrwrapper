@@ -135,6 +135,8 @@ public class HelloWorld {
 
                 // draw VAO
                 GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
+
+                // OPENVR: submit frame to compositor
                 vrProvider.submitFrame();
 
                 // Window management
