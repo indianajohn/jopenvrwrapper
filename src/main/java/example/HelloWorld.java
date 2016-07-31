@@ -103,7 +103,6 @@ public class HelloWorld {
         // This object must be constructed after a valid GLContext exists.
         vrRenderer = new OpenVRStereoRenderer(vrProvider, WIDTH, HEIGHT);
 
-        // the window or has pressed the ESCAPE key.
         long nFrames = 0;
         double fTime = getTime();
         while (glfwWindowShouldClose(window) == GL_FALSE) {
