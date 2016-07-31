@@ -65,6 +65,11 @@ public class HelloWorld {
                 // OPENVR: bind the VAO associated with the target eye
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
 
+                // OPENVR: get rendering transformations
+                // Get projection and pose matrices from OpenVR.
+                Matrix4f matMVP = vrProvider.vrState.getEyeProjectionMatrix(nEye).mul(vrProvider.vrState.getEyePose(nEye));
+                shader.setUniformMatrix("MVP", false, matMVP);
+
                 // ...
                 // rendering code
 
