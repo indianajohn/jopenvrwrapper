@@ -113,7 +113,7 @@ public class HelloWorld {
                 System.out.println("FPS: " + fps);
 
             for (int nEye = 0; nEye < 2; nEye++) {
-                // OPENVR: bind the VAO associated with the target eye
+                // OPENVR: bind the FBO associated with the target eye
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
 
                 // tell OpenGL to use the shader
