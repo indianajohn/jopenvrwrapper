@@ -149,7 +149,6 @@ public class ShaderProgram
             buf16Pool = BufferUtils.createFloatBuffer(16);
         buf16Pool.clear();
         mat.get(buf16Pool);
-        buf16Pool.flip();
         glUniformMatrix4fv(loc, transposed, buf16Pool);
     }
 
