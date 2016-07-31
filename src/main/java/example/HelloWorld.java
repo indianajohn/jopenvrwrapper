@@ -99,7 +99,7 @@ public class HelloWorld {
 
         // OPENVR: create the rendering context for the eyes.
         // This object must be constructed after a valid GLContext exists.
-        vrRenderer = new OpenVRStereoRenderer(vrProvider,1280,720);
+        vrRenderer = new OpenVRStereoRenderer(vrProvider,WIDTH,HEIGHT);
 
         // the window or has pressed the ESCAPE key.
         long nFrames = 0;
