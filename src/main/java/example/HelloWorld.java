@@ -1,5 +1,7 @@
-package openvrprovider;
+package example;
 
+import openvrprovider.OpenVRProvider;
+import openvrprovider.OpenVRStereoRenderer;
 import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -55,6 +57,10 @@ public class HelloWorld {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
         int WIDTH = 300;
         int HEIGHT = 300;
@@ -110,14 +116,12 @@ public class HelloWorld {
             {
                 System.out.println(vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
-                glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-                glClearDepth(1.0);
+                glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
             }
             vrProvider.submitFrame();
             EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
-            glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-            glClearDepth(1.0);
+            glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
             glfwSwapBuffers(window); // swap the color buffers
@@ -129,16 +133,16 @@ public class HelloWorld {
     }
 
     public static void main(String[] args) {
-        OpenVRProvider provider = new OpenVRProvider();
+        //OpenVRProvider provider = new OpenVRProvider();
         try {
-            provider.vrState.addControllerListener(new SampleControllerListener());
-            Thread vrPoller = new Thread(provider, "vrPoller");
-            vrPoller.start();
+            //provider.vrState.addControllerListener(new SampleControllerListener());
+            //Thread vrPoller = new Thread(provider, "vrPoller");
+            //vrPoller.start();
             SharedLibraryLoader.load();
             HelloWorld app = new HelloWorld();
-            app.setVRProvider(provider);
+            //app.setVRProvider(provider);
             app.run();
-            vrPoller.join();
+            //vrPoller.join();
         } catch (Exception e) {
             System.out.println("Unhandled exception: " + e.toString());
         }

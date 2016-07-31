@@ -10,7 +10,7 @@ public class OpenVRStereoRenderer {
     // TextureIDs of framebuffers for each eye
     private int eyeTextureIDs[] = new int[2];
 
-	OpenVRStereoRenderer( OpenVRProvider _vrProvider, int lwidth, int lheight) {
+	public OpenVRStereoRenderer( OpenVRProvider _vrProvider, int lwidth, int lheight) {
 		vrProvider = _vrProvider;
 		createRenderTexture(lwidth,lheight);
 	}

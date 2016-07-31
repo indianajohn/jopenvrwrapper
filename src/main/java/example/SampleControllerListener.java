@@ -1,6 +1,7 @@
-package openvrprovider;
+package example;
 
 import jopenvr.VRControllerState_t;
+import openvrprovider.ControllerListener;
 
 import static openvrprovider.OpenVRUtil.switchedDown;
 import static openvrprovider.OpenVRUtil.switchedUp;
