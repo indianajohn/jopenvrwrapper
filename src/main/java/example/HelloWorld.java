@@ -152,34 +152,15 @@ public class HelloWorld {
 
                 // draw VAO
                 GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
+                vrProvider.submitFrame();
+
+
+                glfwSwapBuffers(window); // swap the color buffers
+                // Poll for window events. The key callback above will only be
+                // invoked during this call.
+                glfwPollEvents();
+                glFinish();
             }
-            vrProvider.submitFrame();
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
-            EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
-
-            // tell OpenGL to use the shader
-            GL20.glUseProgram( shader.getProgramId() );
-
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
-            Matrix4f matMVP = vrProvider.vrState.getEyeProjectionMatrix(1).mul(vrProvider.vrState.getEyePose(1));
-            shader.setUniformMatrix("MVP",false,matMVP);
-
-            // bind vertex and color data
-            GL30.glBindVertexArray(vaoHandle);
-            GL20.glEnableVertexAttribArray(0); // VertexPosition
-            GL20.glEnableVertexAttribArray(1); // VertexColor
-
-            // draw VAO
-            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
-
-            glfwSwapBuffers(window); // swap the color buffers
-            // Poll for window events. The key callback above will only be
-            // invoked during this call.
-            glfwPollEvents();
         }
     }
 
