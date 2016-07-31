@@ -124,24 +124,22 @@ public class HelloWorld {
         GL20.glEnableVertexAttribArray(1); // VertexColor
         shader.init(userDir + "/shaders/HelloWorld.glslv",userDir + "/shaders/HelloWorld.glslf");
 
-        //vrRenderer = new OpenVRStereoRenderer(vrProvider,1080,1200);
+        vrRenderer = new OpenVRStereoRenderer(vrProvider,1080,1200);
 
         // Set the clear color
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
-            /*
             for (int nEye = 0; nEye < 2; nEye++)
             {
-                System.out.println(vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
+                shader.setUniformMatrix("MVP",false,vrProvider.vrState.getEyePose(nEye).mul(vrProvider.vrState.getEyeProjectionMatrix(nEye)));
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
                 glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
             }
             vrProvider.submitFrame();
             EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
-            */
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
@@ -225,16 +223,16 @@ public class HelloWorld {
     }
 
     public static void main(String[] args) {
-        //OpenVRProvider provider = new OpenVRProvider();
+        OpenVRProvider provider = new OpenVRProvider();
         try {
-            //provider.vrState.addControllerListener(new SampleControllerListener());
-            //Thread vrPoller = new Thread(provider, "vrPoller");
-            //vrPoller.start();
+            provider.vrState.addControllerListener(new SampleControllerListener());
+            Thread vrPoller = new Thread(provider, "vrPoller");
+            vrPoller.start();
             SharedLibraryLoader.load();
             HelloWorld app = new HelloWorld();
-            //app.setVRProvider(provider);
+            app.setVRProvider(provider);
             app.run();
-            //vrPoller.join();
+            vrPoller.join();
         } catch (Exception e) {
             System.out.println("Unhandled exception: " + e.toString());
         }
