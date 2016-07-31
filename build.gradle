@@ -1,9 +1,19 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'application'
 apply plugin: 'idea'
 
-mainClassName = 'openvrprovider.HelloWorld'
+project.ext.lwjglVersion = "3.0.0a"
+project.ext.jomlVersion = "1.8.1"
+
+task run(dependsOn: classes, type: JavaExec) {
+    main = 'openvrprovider.HelloWorld'
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    ignoreExitValue = true
+    if (System.properties['os.name'].toLowerCase().contains('mac')) {
+        jvmArgs "-XstartOnFirstThread"
+    }
+}
 
 // tag::repositories[]
 repositories {
@@ -25,8 +35,6 @@ jar {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-project.ext.lwjglVersion = "3.0.0a"
-project.ext.jomlVersion = "1.8.1"
 dependencies {
     compile "joda-time:joda-time:2.2"
     // https://mvnrepository.com/artifact/net.java.dev.jna/platform
