@@ -4,6 +4,7 @@ import jopenvr.HmdMatrix34_t;
 import jopenvr.HmdMatrix44_t;
 import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
+
 import java.util.concurrent.TimeUnit;
 
 /* Utility functions that don't interact with the headset (conversions and the like) */

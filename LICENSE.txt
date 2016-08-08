@@ -1,0 +1,5 @@
+You are free to use this code however you would like within the license restrictions of
+the packages from which I have derived it:
+
+* OpenVR by Valve https://github.com/ValveSoftware/openvr
+* jopenvr, part of jMonkeyVR by phr00t: https://github.com/phr00t/jMonkeyVR

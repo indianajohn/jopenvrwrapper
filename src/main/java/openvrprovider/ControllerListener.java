@@ -14,6 +14,7 @@ public interface ControllerListener {
     public static long k_buttonAppMenu = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_ApplicationMenu);
     public static long k_buttonGrip = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_Grip);
     public static float triggerThreshold = .25f;
+
     public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController);
     // TODO: touch, axes
 }

@@ -2,6 +2,7 @@ package openvrprovider;
 
 import jopenvr.*;
 import org.joml.Matrix4f;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +33,9 @@ public class OpenVRState {
     OpenVRState() {
         for (int c = 0; c < 2; c++) {
             lastControllerState[c] = new VRControllerState_t();
-            controllerPose[c] = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-            eyePoses[c] = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-            projectionMatrices[c] = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+            controllerPose[c] = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+            eyePoses[c] = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+            projectionMatrices[c] = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
             for (int i = 0; i < 5; i++) {
                 lastControllerState[c].rAxis[i] = new VRControllerAxis_t();
