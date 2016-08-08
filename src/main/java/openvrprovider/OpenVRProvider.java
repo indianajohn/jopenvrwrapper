@@ -316,7 +316,8 @@ public class OpenVRProvider implements Runnable {
                     texType[nEye], null,
                     JOpenVRLibrary.EVRSubmitFlags.EVRSubmitFlags_Submit_Default);
         }
-        vrCompositor.PostPresentHandoff.apply();
+        if (vrCompositor.PostPresentHandoff != null)
+            vrCompositor.PostPresentHandoff.apply();
     }
 
     public void setNearClip(float _nearClip) { nearClip = _nearClip;}
