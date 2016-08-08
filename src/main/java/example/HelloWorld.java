@@ -196,6 +196,7 @@ public class HelloWorld {
             vrPoller.join();
         } catch (Exception e) {
             System.out.println("Unhandled exception: " + e.toString());
+            e.printStackTrace();
         }
         System.out.println("Exited normally.");
     }
