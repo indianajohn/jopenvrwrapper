@@ -57,13 +57,13 @@ public class OpenVRState {
     }
 
     public Matrix4f getEyePose(int nEye) {
-        Matrix4f matrixReturn = eyePoses[nEye].mul(headPose);
-        matrixReturn = matrixReturn.invert();
+        Matrix4f matrixReturn = new Matrix4f(headPose);
+        matrixReturn.mul(eyePoses[nEye]);
         return matrixReturn;
     }
 
     public Matrix4f getEyeProjectionMatrix(int nEye) {
-        return projectionMatrices[nEye];
+        return new Matrix4f(projectionMatrices[nEye]);
     }
 
     public void updateControllerButtonState(

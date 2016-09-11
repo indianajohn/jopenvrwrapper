@@ -99,6 +99,9 @@ public class HelloWorld {
         String userDir = System.getProperty("user.dir");
         shader.init(userDir + "/shaders/HelloWorld.glslv", userDir + "/shaders/HelloWorld.glslf");
 
+        // OPENVR: Initialize OpenVR. This must be done before creating your OpenVRStereoRenderer.
+        vrProvider.init();
+
         // OPENVR: create the rendering context for the eyes.
         // This object must be constructed after a valid GLContext exists.
         vrRenderer = new OpenVRStereoRenderer(vrProvider, WIDTH, HEIGHT);
@@ -112,10 +115,12 @@ public class HelloWorld {
             if (nFrames % 1000 == 0)
                 System.out.println("FPS: " + fps);
 
-            // OPENVR: call updatePose(), force the poses stored in the vrProvider to update.
+            // OPENVR: call updateState(), force the info stored in the vrProvider to update.
             // The upstream SDK recommends this sequence, and if you don't do things in this
             // order frame submission can be glitchy.
-            vrProvider.updatePose();
+            vrProvider.updateState();
+            //System.out.println("Left eye\n" + vrProvider.vrState.getEyePose(0));
+            //System.out.println("RIght eye\n" + vrProvider.vrState.getEyePose(1));
             for (int nEye = 0; nEye < 2; nEye++) {
                 // OPENVR: bind the FBO associated with the target eye
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
@@ -129,7 +134,10 @@ public class HelloWorld {
 
                 // OPENVR: get rendering transformations
                 // Get projection and pose matrices from OpenVR.
-                Matrix4f matMVP = vrProvider.vrState.getEyeProjectionMatrix(nEye).mul(vrProvider.vrState.getEyePose(nEye));
+                Matrix4f eyePose = vrProvider.vrState.getEyePose(nEye);
+                Matrix4f matView = new Matrix4f(eyePose).invert();
+                Matrix4f eyeProjection = vrProvider.vrState.getEyeProjectionMatrix(nEye);
+                Matrix4f matMVP = eyeProjection.mul(matView);
                 shader.setUniformMatrix("MVP", false, matMVP);
 
                 // bind vertex and color data
@@ -141,7 +149,6 @@ public class HelloWorld {
                 GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
 
                 // Window management
-                glfwSwapBuffers(window);
                 glfwPollEvents();
             }
             // OPENVR: submit frame to compositor
@@ -190,14 +197,14 @@ public class HelloWorld {
         // OPENVR: object initialization.
         OpenVRProvider provider = new OpenVRProvider();
         try {
-            provider.vrState.addControllerListener(new SampleControllerListener());
-            Thread vrPoller = new Thread(provider, "vrPoller");
-            vrPoller.start();
+            //provider.vrState.addControllerListener(new SampleControllerListener());
+            //Thread vrPoller = new Thread(provider, "vrPoller");
+            //vrPoller.start();
             SharedLibraryLoader.load();
             HelloWorld app = new HelloWorld();
             app.setVRProvider(provider);
             app.run();
-            vrPoller.join();
+            //vrPoller.join();
         } catch (Exception e) {
             System.out.println("Unhandled exception: " + e.toString());
             e.printStackTrace();

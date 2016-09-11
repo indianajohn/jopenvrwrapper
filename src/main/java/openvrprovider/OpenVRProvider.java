@@ -15,7 +15,7 @@ import static openvrprovider.ControllerListener.RIGHT_CONTROLLER;
  * some information from the headset/controllers you should probably look at OpenVRStereoRenderer, ControllerListener,
  * or OpenVRState
   * */
-public class OpenVRProvider implements Runnable {
+public class OpenVRProvider {
     private static boolean initialized = false;
     private static VR_IVRSystem_FnTable vrsystem;
     private static VR_IVRCompositor_FnTable vrCompositor;
@@ -38,7 +38,7 @@ public class OpenVRProvider implements Runnable {
     private static boolean keyboardShowing = false;
     private static boolean headIsTracking = false;
 
-    private boolean init() {
+    public boolean init() {
         try {
             if (!initializeOpenVRLibrary())
                 return false;
@@ -49,6 +49,7 @@ public class OpenVRProvider implements Runnable {
         } catch (Exception e) {
             return false;
         }
+        initialized = true;
         return true;
     }
 
@@ -56,14 +57,13 @@ public class OpenVRProvider implements Runnable {
         initialized = false;
     }
 
-    @Override
-    public void run() {
-        initialized = init();
-        while (initialized) {
-            OpenVRUtil.sleepNanos(10000);
-            pollControllers();
-            pollInputEvents();
-        }
+    public void updateState()
+    {
+        if (!initialized)
+            init();
+        updatePose();
+        pollControllers();
+        pollInputEvents();
     }
 
     private void pollControllers() {
@@ -268,7 +268,7 @@ public class OpenVRProvider implements Runnable {
         }
     }
 
-    public void updatePose() {
+    private void updatePose() {
         if (vrsystem == null || vrCompositor == null)
             return;
 
