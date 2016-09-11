@@ -51,6 +51,8 @@ public class OSValidator {
     }
 
     public static String getLibPath() {
+        if (getOsString().contains("win"))
+            return userDir + "\\lib\\" + getOsString();
         return userDir + "/lib/" + getOsString();
     }
 
