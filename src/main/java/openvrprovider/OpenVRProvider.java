@@ -61,7 +61,6 @@ public class OpenVRProvider implements Runnable {
         initialized = init();
         while (initialized) {
             OpenVRUtil.sleepNanos(10000);
-            updatePose();
             pollControllers();
             pollInputEvents();
         }
@@ -269,7 +268,7 @@ public class OpenVRProvider implements Runnable {
         }
     }
 
-    private void updatePose() {
+    public void updatePose() {
         if (vrsystem == null || vrCompositor == null)
             return;
 

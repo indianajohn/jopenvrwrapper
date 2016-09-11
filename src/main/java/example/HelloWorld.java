@@ -112,6 +112,10 @@ public class HelloWorld {
             if (nFrames % 1000 == 0)
                 System.out.println("FPS: " + fps);
 
+            // OPENVR: call updatePose(), force the poses stored in the vrProvider to update.
+            // The upstream SDK recommends this sequence, and if you don't do things in this
+            // order frame submission can be glitchy.
+            vrProvider.updatePose();
             for (int nEye = 0; nEye < 2; nEye++) {
                 // OPENVR: bind the FBO associated with the target eye
                 EXTFramebufferObject.glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, vrRenderer.getTextureHandleForEyeFramebuffer(nEye));
